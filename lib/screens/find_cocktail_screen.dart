@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hw42/helpers/request.dart';
 import 'package:hw42/screens/recipe_screen.dart';
-
 import '../models/cocktail.dart';
-import '../models/ingredient.dart';
 import '../widgets/cocktail_card.dart';
 
 class FindCocktailScreen extends StatefulWidget {
