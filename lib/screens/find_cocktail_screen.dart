@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hw42/helpers/request.dart';
+import 'package:hw42/screens/recipe_screen.dart';
 
 import '../models/cocktail.dart';
+import '../models/ingredient.dart';
 import '../widgets/cocktail_card.dart';
 
 class FindCocktailScreen extends StatefulWidget {
@@ -17,6 +19,16 @@ class _FinState extends State<FindCocktailScreen> {
   List<Cocktail> cocktails = [];
   String? errorTxt;
   bool isFetching = false;
+  void showCocktail(BuildContext context, String cocktailId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                RecipeScreen(cocktailId: cocktailId, cocktails: cocktails),
+      ),
+    );
+  }
 
   Future<void> searchCocktail() async {
     setState(() {
@@ -43,7 +55,7 @@ class _FinState extends State<FindCocktailScreen> {
       }
     } catch (e) {
       setState(() {
-        errorTxt = 'Something went wrong,we are working on it!';
+        errorTxt = e.toString();
         isFetching = false;
       });
     }
@@ -59,21 +71,29 @@ class _FinState extends State<FindCocktailScreen> {
     } else {
       return Column(
         children: [
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-              controller: cocktailController,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                label: Text('Enter cocktail name'),
-                border: OutlineInputBorder(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: TextField(
+                    controller: cocktailController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      label: Text('Enter cocktail name'),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
               ),
-            ),
+              IconButton(
+                onPressed: searchCocktail,
+                icon: Icon(Icons.search_rounded, size: 35),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: searchCocktail,
-            icon: Icon(Icons.search_rounded, size: 30),
-          ),
+
           Expanded(
             child: GridView.builder(
               itemCount: cocktails.length,
@@ -84,7 +104,10 @@ class _FinState extends State<FindCocktailScreen> {
                 mainAxisExtent: 250,
               ),
               itemBuilder:
-                  (context, index) => CocktailCard(cocktail: cocktails[index]),
+                  (context, index) => CocktailCard(
+                    cocktail: cocktails[index],
+                    onTap: () => showCocktail(context, cocktails[index].id),
+                  ),
             ),
           ),
         ],
