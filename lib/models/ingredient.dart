@@ -11,7 +11,7 @@ class Ingredient {
       String? ingredient = json['strIngredient$i'];
       String? measure = json['strMeasure$i'];
 
-      if (ingredient != null && ingredient.isNotEmpty) {
+      if (ingredient != null) {
         ingredients.add(Ingredient(name: ingredient, measure: measure ?? ''));
       }
     }

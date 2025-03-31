@@ -15,6 +15,7 @@ final cocktailController = TextEditingController();
 
 class _FinState extends State<FindCocktailScreen> {
   List<Cocktail> cocktails = [];
+  bool hasSearched = false;
   String? errorTxt;
   bool isFetching = false;
   void showCocktail(BuildContext context, String cocktailId) {
@@ -31,19 +32,21 @@ class _FinState extends State<FindCocktailScreen> {
   Future<void> searchCocktail() async {
     setState(() {
       isFetching = true;
+      hasSearched = true;
     });
     try {
-      final cocktail = cocktailController.text;
+      final cocktail = cocktailController.text.trim();
       final Map<String, dynamic> info = await request(
         'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=$cocktail',
       );
-      if (info['drinks'] != null) {
+      if (info['drinks'] != null && cocktail.isNotEmpty) {
         setState(() {
           cocktails =
               (info['drinks'] as List<dynamic>)
                   .map((e) => Cocktail.fromJson(e))
                   .toList();
           isFetching = false;
+          hasSearched = false;
         });
       } else {
         setState(() {
@@ -61,6 +64,7 @@ class _FinState extends State<FindCocktailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Widget content;
     if (isFetching) {
       content = Center(child: CircularProgressIndicator());
@@ -91,23 +95,25 @@ class _FinState extends State<FindCocktailScreen> {
               ),
             ],
           ),
-
-          Expanded(
-            child: GridView.builder(
-              itemCount: cocktails.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 30,
-                mainAxisSpacing: 10,
-                mainAxisExtent: 250,
+          if (cocktails.isNotEmpty)
+            Expanded(
+              child: GridView.builder(
+                itemCount: cocktails.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 30,
+                  mainAxisSpacing: 10,
+                  mainAxisExtent: 250,
+                ),
+                itemBuilder:
+                    (context, index) => CocktailCard(
+                      cocktail: cocktails[index],
+                      onTap: () => showCocktail(context, cocktails[index].id),
+                    ),
               ),
-              itemBuilder:
-                  (context, index) => CocktailCard(
-                    cocktail: cocktails[index],
-                    onTap: () => showCocktail(context, cocktails[index].id),
-                  ),
-            ),
-          ),
+            )
+          else if (hasSearched)
+            Text('No cocktails found', style: theme.textTheme.titleLarge),
         ],
       );
     }

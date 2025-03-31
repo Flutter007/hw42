@@ -10,7 +10,6 @@ class CocktailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      color: theme.colorScheme.inversePrimary,
       elevation: 7,
       child: InkWell(
         onTap: onTap,
